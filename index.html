@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SkyAudit NP — Nepal Aviation Benchmark Dashboard</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="assets/style.css" />
+</head>
+<body>
+
+<!-- ============================================================
+     TOP BAR
+     ============================================================ -->
+<header class="topbar" role="banner">
+  <div class="topbar-logo">
+    <!-- Inline SVG plane icon -->
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="rgba(245,166,35,0.15)"/>
+      <path d="M6 16.5L13 12L11 7L14 8.5L15.5 12.5L20 10L22 11.5L18 14L24 13.5L24.5 15.5L17 17L15 22L12.5 23L13.5 18L8 20L6 16.5Z" fill="#F5A623"/>
+    </svg>
+    <div class="logo-text">
+      <span class="logo-name">SkyAudit NP</span>
+      <span class="logo-tagline">Nepal Aviation — Benchmark Analysis</span>
+    </div>
+  </div>
+
+  <nav class="topbar-center" aria-label="Airline view toggle">
+    <div class="airline-toggle" role="group" aria-label="Select airline view">
+      <button class="toggle-btn" data-view="nepal" aria-pressed="false">🇳🇵 Nepal Airlines</button>
+      <button class="toggle-btn" data-view="druk" aria-pressed="false">🇧🇹 Druk Air</button>
+      <button class="toggle-btn active" data-view="compare" aria-pressed="true">⚖️ Compare</button>
+    </div>
+  </nav>
+
+  <div class="topbar-right">
+    <span class="year-badge" aria-label="Report year">🗓 2022–2023</span>
+    <button class="btn btn-ghost" id="export-btn" aria-label="Export dashboard as PDF">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 12l-4-4h2.5V4h3v4H12L8 12zM2 14h12v-1.5H2V14z"/>
+      </svg>
+      Export PDF
+    </button>
+    <button class="btn" id="upload-btn" aria-label="Upload your own CSV data files">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 1l4 4H9.5v5h-3V5H4L8 1zM2 13h12v1.5H2V13z"/>
+      </svg>
+      Upload Data
+    </button>
+  </div>
+</header>
+
+<!-- ============================================================
+     MAIN WRAPPER
+     ============================================================ -->
+<main class="main-wrapper" role="main">
+
+  <!-- Demo Mode Banner -->
+  <div class="demo-banner" id="demo-banner" role="alert" aria-live="polite">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+      <path d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm.75 10.5h-1.5v-5h1.5v5zm0-6.5h-1.5V3.5h1.5V5z"/>
+    </svg>
+    <strong>Using Demo Data</strong> — Figures sourced from Nepal Airlines Corp Annual Report FY 2079/80 and Drukair Annual Report 2023. Upload your own CSV files for live analysis.
+  </div>
+
+  <div class="container">
+
+    <!-- ──────────────────────────────────────────
+         HERO KPI STRIP
+         ────────────────────────────────────────── -->
+    <section class="kpi-section" aria-labelledby="kpi-heading">
+      <div class="section-header">
+        <h2 class="section-title" id="kpi-heading">Key Performance Indicators</h2>
+        <span class="section-subtitle">Nepal Airlines vs Druk Air Benchmark</span>
+      </div>
+      <div class="kpi-grid" id="kpi-strip" role="list" aria-label="Key performance indicators">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+    <!-- ──────────────────────────────────────────
+         MAIN GRID
+         ────────────────────────────────────────── -->
+    <div class="main-grid">
+
+      <!-- LEFT COLUMN (60%) -->
+      <div class="left-col">
+
+        <!-- Chart A: Monthly OTP Grouped Bar -->
+        <article class="card" aria-labelledby="chart-otp-title">
+          <div class="card-title">
+            <div class="card-title-icon" aria-hidden="true">📊</div>
+            <h3 id="chart-otp-title">On-Time Performance by Month</h3>
+          </div>
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#E84545"></div>
+              <span>🇳🇵 Nepal Airlines</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:#2ECC71"></div>
+              <span>🇧🇹 Druk Air</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-dot" style="background:rgba(245,166,35,0.5);border:1px dashed #F5A623"></div>
+              <span>80% Target</span>
+            </div>
+          </div>
+          <div class="chart-container" style="height:230px">
+            <canvas id="chart-otp" aria-label="Grouped bar chart showing monthly On-Time Performance for Nepal Airlines and Druk Air" role="img"></canvas>
+          </div>
+          <p style="margin-top:10px;font-size:0.7rem;color:#4A5568">
+            💡 <strong style="color:#8A9BB5">Plain English:</strong> Nepal Airlines gets flights out on time only about half the time (53% average). Druk Air manages around 79% — nearly twice as reliable. The global industry target is 80%.
+          </p>
+        </article>
+
+        <!-- Chart B: Radar Scorecard -->
+        <article class="card" aria-labelledby="chart-radar-title">
+          <div class="card-title">
+            <div class="card-title-icon" aria-hidden="true">🕸️</div>
+            <h3 id="chart-radar-title">6-Axis Performance Scorecard</h3>
+          </div>
+          <p style="font-size:0.7rem;color:#8A9BB5;margin-bottom:8px">Each axis shows a score from 0–100. Bigger area = better airline. Nepal's smaller shape shows where it falls behind.</p>
+          <div class="chart-container-tall">
+            <canvas id="chart-radar" aria-label="Radar chart comparing Nepal Airlines and Druk Air across five performance dimensions" role="img"></canvas>
+          </div>
+        </article>
+
+        <!-- Chart C: Delay Cause Breakdown -->
+        <article class="card" aria-labelledby="chart-delay-title">
+          <div class="card-title">
+            <div class="card-title-icon" aria-hidden="true">⏳</div>
+            <h3 id="chart-delay-title">Delay Cause Breakdown</h3>
+          </div>
+          <div class="chart-container" style="height:200px">
+            <canvas id="chart-delay" aria-label="Horizontal bar chart showing percentage of delays attributed to each cause category for both airlines" role="img"></canvas>
+          </div>
+          <p style="margin-top:10px;font-size:0.7rem;color:#4A5568">
+            💡 <strong style="color:#8A9BB5">Key insight:</strong> Immigration processing causes 33% of Nepal's international delays — more than weather, technical faults, and ATC combined. This is a <strong style="color:#F5A623">government infrastructure problem</strong>, not just an airline problem.
+          </p>
+        </article>
+
+      </div>
+
+      <!-- RIGHT COLUMN (40%) -->
+      <div class="right-col">
+
+        <!-- Scorecard Panel -->
+        <article class="card" aria-labelledby="scorecard-title">
+          <div class="card-title">
+            <div class="card-title-icon" aria-hidden="true">🎓</div>
+            <h3 id="scorecard-title">Performance Grade Card</h3>
+          </div>
+          <div id="scorecard-panel">
+            <!-- Rendered by JS -->
+          </div>
+        </article>
+
+        <!-- Gap Analysis -->
+        <article class="card" aria-labelledby="gap-title">
+          <div class="card-title">
+            <div class="card-title-icon" aria-hidden="true">📏</div>
+            <h3 id="gap-title">Gap vs Druk Air Benchmark</h3>
+          </div>
+          <p style="font-size:0.7rem;color:#8A9BB5;margin-bottom:10px">Red bars = Nepal is behind Druk Air. Taller bar = bigger gap to close.</p>
+          <div class="gap-chart-container">
+            <canvas id="chart-gap" aria-label="Horizontal bar chart showing the performance gap between Nepal Airlines and Druk Air on key metrics" role="img"></canvas>
+          </div>
+        </article>
+
+        <!-- Trend Sparklines -->
+        <article class="card" aria-labelledby="sparklines-title">
+          <div class="card-title">
+            <div class="card-title-icon" aria-hidden="true">📈</div>
+            <h3 id="sparklines-title">12-Month Trend</h3>
+          </div>
+          <div class="sparklines-grid">
+
+            <!-- OTP Nepal -->
+            <div class="sparkline-item">
+              <div class="sparkline-header">
+                <span class="sparkline-label" style="color:#E84545">🇳🇵 OTP %</span>
+                <span class="sparkline-value" id="spark-otp-nepal-val" style="color:#E84545">—</span>
+              </div>
+              <div class="sparkline-container">
+                <canvas id="spark-otp-nepal" aria-label="Trend line for Nepal Airlines on-time performance over 12 months" role="img"></canvas>
+              </div>
+            </div>
+
+            <!-- OTP Druk -->
+            <div class="sparkline-item">
+              <div class="sparkline-header">
+                <span class="sparkline-label" style="color:#2ECC71">🇧🇹 OTP %</span>
+                <span class="sparkline-value" id="spark-otp-druk-val" style="color:#2ECC71">—</span>
+              </div>
+              <div class="sparkline-container">
+                <canvas id="spark-otp-druk" aria-label="Trend line for Druk Air on-time performance over 12 months" role="img"></canvas>
+              </div>
+            </div>
+
+            <!-- Cancel Nepal -->
+            <div class="sparkline-item">
+              <div class="sparkline-header">
+                <span class="sparkline-label" style="color:#E84545">🇳🇵 Cancellations %</span>
+                <span class="sparkline-value" id="spark-cancel-nepal-val" style="color:#E84545">—</span>
+              </div>
+              <div class="sparkline-container">
+                <canvas id="spark-cancel-nepal" aria-label="Trend line for Nepal Airlines cancellation rate over 12 months" role="img"></canvas>
+              </div>
+            </div>
+
+            <!-- Cancel Druk -->
+            <div class="sparkline-item">
+              <div class="sparkline-header">
+                <span class="sparkline-label" style="color:#2ECC71">🇧🇹 Cancellations %</span>
+                <span class="sparkline-value" id="spark-cancel-druk-val" style="color:#2ECC71">—</span>
+              </div>
+              <div class="sparkline-container">
+                <canvas id="spark-cancel-druk" aria-label="Trend line for Druk Air cancellation rate over 12 months" role="img"></canvas>
+              </div>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+
+    <!-- ──────────────────────────────────────────
+         ROUTE DRILL-DOWN TABLE
+         ────────────────────────────────────────── -->
+    <section class="route-section" aria-labelledby="route-heading">
+      <div class="section-header">
+        <h2 class="section-title" id="route-heading">Route-Level Performance</h2>
+        <span class="section-subtitle">Click any row to expand monthly breakdown</span>
+      </div>
+      <article class="card">
+        <div class="route-table-wrap">
+          <table class="route-table" aria-label="Route-level performance comparison between Nepal Airlines and Druk Air">
+            <thead>
+              <tr>
+                <th scope="col">Route</th>
+                <th scope="col">
+                  <span data-tooltip="On-Time Performance: % of flights departing within 15 min of schedule">
+                    Nepal OTP %
+                  </span>
+                </th>
+                <th scope="col">Druk OTP %</th>
+                <th scope="col">Nepal Avg Delay</th>
+                <th scope="col">Druk Avg Delay</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody id="route-tbody">
+              <!-- Rendered by JS -->
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:12px;font-size:0.7rem;color:#4A5568">
+          💡 <strong style="color:#8A9BB5">Reading this table:</strong> ✅ = Meets or exceeds 75% OTP target &nbsp;|&nbsp; ⚠️ = 60–75%, needs attention &nbsp;|&nbsp; 🔴 = Below 60%, critical intervention required. Click a row to see how performance varied each month.
+        </p>
+      </article>
+    </section>
+
+    <!-- ──────────────────────────────────────────
+         RECOMMENDATIONS PANEL
+         ────────────────────────────────────────── -->
+    <section class="reco-section" aria-labelledby="reco-heading">
+      <div class="section-header" style="margin-bottom:var(--space-lg)">
+        <div>
+          <h2 class="section-title" id="reco-heading">Policy Recommendations for the Aviation Minister</h2>
+          <p style="font-size:var(--fs-label);color:var(--color-text-secondary);margin-top:4px">
+            Data-driven actions to close the gap between Nepal Airlines and regional benchmark Druk Air. Click any card to read the full rationale and ICAO reference.
+          </p>
+        </div>
+      </div>
+      <div class="reco-grid" id="reco-grid" role="list" aria-label="Policy recommendations">
+        <!-- Rendered by JS -->
+      </div>
+    </section>
+
+  </div><!-- /container -->
+</main>
+
+<!-- ============================================================
+     UPLOAD MODAL
+     ============================================================ -->
+<div class="modal-overlay" id="upload-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-title">📥 Upload Your Data</h2>
+      <button class="modal-close" id="modal-close" aria-label="Close upload dialog">&times;</button>
+    </div>
+
+    <p style="font-size:var(--fs-label);color:var(--color-text-secondary);margin-bottom:var(--space-lg)">
+      Upload CSV files with your airline data. The dashboard will automatically detect column names and re-render all charts.
+      Expected columns: <code style="color:#F5A623;font-size:0.7rem">otp_pct, load_factor_pct, flights_operated, cancellation_rate, avg_delay_minutes, month</code>
+    </p>
+
+    <!-- Nepal Airlines Upload -->
+    <div style="margin-bottom:var(--space-md)">
+      <div style="font-size:var(--fs-label);font-weight:600;color:#E84545;margin-bottom:8px">🇳🇵 Nepal Airlines Data</div>
+      <div class="upload-zone" id="drop-zone-nepal" role="button" tabindex="0" aria-label="Drop Nepal Airlines CSV file here or click to browse">
+        <div style="font-size:2rem;margin-bottom:8px">📂</div>
+        <div class="upload-zone-label">Drop airline_np.csv here or click to browse</div>
+        <div class="upload-zone-sublabel">CSV or JSON · Column names auto-detected</div>
+      </div>
+      <div id="upload-preview-nepal"></div>
+      <input type="file" id="file-nepal" accept=".csv,.json" style="display:none" aria-label="Select Nepal Airlines data file" />
+    </div>
+
+    <!-- Druk Air Upload -->
+    <div style="margin-bottom:var(--space-lg)">
+      <div style="font-size:var(--fs-label);font-weight:600;color:#2ECC71;margin-bottom:8px">🇧🇹 Druk Air Data</div>
+      <div class="upload-zone" id="drop-zone-druk" role="button" tabindex="0" aria-label="Drop Druk Air CSV file here or click to browse">
+        <div style="font-size:2rem;margin-bottom:8px">📂</div>
+        <div class="upload-zone-label">Drop airline_druk.csv here or click to browse</div>
+        <div class="upload-zone-sublabel">CSV or JSON · Column names auto-detected</div>
+      </div>
+      <div id="upload-preview-druk"></div>
+      <input type="file" id="file-druk" accept=".csv,.json" style="display:none" aria-label="Select Druk Air data file" />
+    </div>
+
+    <div style="background:rgba(245,166,35,0.08);border:1px solid rgba(245,166,35,0.2);border-radius:8px;padding:12px;font-size:0.7rem;color:#8A9BB5">
+      <strong style="color:#F5A623">Tip:</strong> If your column names don't match, the dashboard will use whatever data it finds and fall back to demo data for missing fields. No data leaves your browser — all processing is done locally.
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="footer" role="contentinfo">
+  Dashboard generated for <strong>CAAN / Ministry of Tourism & Civil Aviation, Nepal</strong> &nbsp;|&nbsp;
+  Data sources: Nepal Airlines Corporation Annual Progress Report FY 2079/80 · Drukair Corporation Limited Annual Report 2023 &nbsp;|&nbsp;
+  For educational and policy analysis use &nbsp;|&nbsp;
+  <span style="color:#1F2A3C">SkyAudit NP v1.0</span>
+</footer>
+
+<!-- Dashboard JS -->
+<script src="assets/dashboard.js"></script>
+
+</body>
+</html>
