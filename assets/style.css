@@ -219,6 +219,12 @@ section.last { padding-bottom: 64px; }
   flex-shrink: 0;
 }
 
+.logo-badge img {
+  max-width: 70%;
+  max-height: 70%;
+  display: block;
+}
+
 .logo-badge-nepal {
   background: var(--nepal);
 }
