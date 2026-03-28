@@ -254,7 +254,25 @@ section.last { padding-bottom: 64px; }
   height: 80px;
 }
 
-.plane-svg-wrap.flip svg { transform: scaleX(-1); }
+.plane-svg-wrap img {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+  object-fit: contain;
+}
+
+.plane-caption {
+  margin-top: -8px;
+  margin-bottom: 18px;
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--muted);
+}
+
+.plane-svg-wrap.flip svg,
+.plane-svg-wrap.flip img { transform: scaleX(-1); }
 
 .airline-stats {
   display: grid;
