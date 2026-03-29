@@ -92,6 +92,90 @@ const ROUTES = [
   { route:'KTM — BOM', full:'Kathmandu — Mumbai',    nepal_otp:45, druk_otp:null, nepal_delay:95, druk_delay:null },
 ];
 
+const ROUTE_MAP_SIZE = { width: 960, height: 420 };
+const ROUTE_MAP_BOUNDS = { minLon: 42, maxLon: 146, maxLat: 42, minLat: -2 };
+const EMBEDDED_ROUTE_TABLE = `airline,origin_iata,destination_iata,route_type,service_pattern,via_iata,seasonal,status_note
+Drukair,PBH,DXB,International,Direct,,No,Current destination
+Drukair,PBH,DEL,International,Direct,,No,Current destination
+Drukair,PBH,KTM,International,Direct,,No,Current destination
+Drukair,PBH,IXB,International,Direct,,No,Current destination
+Drukair,PBH,GAY,International,Direct,,Yes,Seasonal destination
+Drukair,PBH,CCU,International,Direct,,No,Current destination
+Drukair,PBH,GAU,International,Direct,,No,Current destination
+Drukair,PBH,DAC,International,Direct,,No,Current destination
+Drukair,PBH,BKK,International,Via/varies,"GAU|IXB|GAY",No,Current destination
+Drukair,PBH,SIN,International,Via,GAU,No,Current destination
+Nepal Airlines,KTM,DEL,International,Direct,,No,Current destination
+Nepal Airlines,KTM,BKK,International,Direct,,No,Current destination
+Nepal Airlines,KTM,KUL,International,Direct,,No,Current destination
+Nepal Airlines,KTM,BLR,International,Direct,,No,Current destination
+Nepal Airlines,KTM,HKG,International,Direct,,No,Current destination
+Nepal Airlines,KTM,DOH,International,Direct,,No,Current destination
+Nepal Airlines,KTM,NRT,International,Direct,,No,Current destination
+Nepal Airlines,KTM,DXB,International,Direct,,No,Current destination
+Nepal Airlines,KTM,BOM,International,Direct,,No,Current destination
+Nepal Airlines,KTM,DMM,International,Direct,,No,Current destination
+Nepal Airlines,KTM,CAN,International,Direct,,No,Current destination
+Nepal Airlines,KTM,RUH,International,Unknown,,No,Unconfirmed on current schedule`;
+
+const AIRPORT_COORDS = {
+  PBH: { lon: 89.4246, lat: 27.4032, name: 'Paro', country: 'Bhutan' },
+  DXB: { lon: 55.3644, lat: 25.2532, name: 'Dubai', country: 'United Arab Emirates' },
+  DEL: { lon: 77.1031, lat: 28.5562, name: 'Delhi', country: 'India' },
+  KTM: { lon: 85.3591, lat: 27.6966, name: 'Kathmandu', country: 'Nepal' },
+  IXB: { lon: 88.3297, lat: 26.6812, name: 'Bagdogra', country: 'India' },
+  GAY: { lon: 84.9512, lat: 24.7443, name: 'Gaya', country: 'India' },
+  CCU: { lon: 88.4467, lat: 22.6547, name: 'Kolkata', country: 'India' },
+  GAU: { lon: 91.5859, lat: 26.1061, name: 'Guwahati', country: 'India' },
+  DAC: { lon: 90.3978, lat: 23.8433, name: 'Dhaka', country: 'Bangladesh' },
+  BKK: { lon: 100.7501, lat: 13.69, name: 'Bangkok', country: 'Thailand' },
+  SIN: { lon: 103.994, lat: 1.3644, name: 'Singapore', country: 'Singapore' },
+  KUL: { lon: 101.7099, lat: 2.7456, name: 'Kuala Lumpur', country: 'Malaysia' },
+  BLR: { lon: 77.7063, lat: 13.1986, name: 'Bengaluru', country: 'India' },
+  HKG: { lon: 113.9185, lat: 22.308, name: 'Hong Kong', country: 'Hong Kong' },
+  DOH: { lon: 51.6081, lat: 25.2731, name: 'Doha', country: 'Qatar' },
+  NRT: { lon: 140.3874, lat: 35.773, name: 'Tokyo Narita', country: 'Japan' },
+  BOM: { lon: 72.874, lat: 19.0896, name: 'Mumbai', country: 'India' },
+  DMM: { lon: 49.7979, lat: 26.4712, name: 'Dammam', country: 'Saudi Arabia' },
+  CAN: { lon: 113.2988, lat: 23.3924, name: 'Guangzhou', country: 'China' },
+  RUH: { lon: 46.6988, lat: 24.9576, name: 'Riyadh', country: 'Saudi Arabia' },
+};
+
+const AIRPORT_LABEL_OFFSETS = {
+  KTM: { x: 10, y: -12 },
+  PBH: { x: 10, y: 16 },
+  DEL: { x: -12, y: -10, anchor: 'end' },
+  IXB: { x: 10, y: -10 },
+  GAY: { x: -10, y: 14, anchor: 'end' },
+  CCU: { x: -12, y: 16, anchor: 'end' },
+  GAU: { x: 10, y: 14 },
+  DAC: { x: 10, y: 14 },
+  BKK: { x: 10, y: -10 },
+  SIN: { x: 10, y: 14 },
+  KUL: { x: -10, y: 14, anchor: 'end' },
+  CAN: { x: 10, y: 14 },
+  HKG: { x: 10, y: -10 },
+  DOH: { x: -10, y: -10, anchor: 'end' },
+  DXB: { x: -10, y: 16, anchor: 'end' },
+  DMM: { x: -10, y: 14, anchor: 'end' },
+  RUH: { x: -10, y: -10, anchor: 'end' },
+  BOM: { x: -10, y: 14, anchor: 'end' },
+  NRT: { x: 10, y: -10 },
+  BLR: { x: 10, y: 14 }
+};
+
+const ROUTE_AIRLINE_META = {
+  nepal: { key: 'nepal', label: 'Nepal Airlines', color: '#E8253D' },
+  druk: { key: 'druk', label: 'Drukair', color: '#1DAB9F' }
+};
+
+const routeMapState = {
+  filter: 'both',
+  routes: [],
+  initialized: false,
+  map: null,
+  layerGroups: null
+};
 /* ── COMPARISON TABLE ROWS ── */
 const TABLE_ROWS = [
   { cat: '✈️  OPERATIONS' },
@@ -431,169 +515,422 @@ function renderDelayChart() {
 }
 
 /* ── WORLD MAP (SVG + Route Arcs) ── */
-function renderMap() {
-  const svg = document.getElementById('route-map');
-  if (!svg) return;
+function parseCsvLine(line) {
+  const values = [];
+  let current = '';
+  let inQuotes = false;
 
-  // Route endpoints [lon, lat] → [x%, y%] on a simplified equirectangular map
-  // Map bounds: lon -10 to 160, lat 60 to -15
-  const project = (lon, lat) => {
-    const x = ((lon + 10) / 170) * 100;
-    const y = ((60 - lat) / 75) * 100;
-    return { x, y };
-  };
+  for (let i = 0; i < line.length; i += 1) {
+    const char = line[i];
+    const next = line[i + 1];
 
-  const airports = {
-    KTM: { lon: 85.36, lat: 27.70, label: 'KTM', name: 'Kathmandu' },
-    PBH: { lon: 89.43, lat: 27.40, label: 'PBH', name: 'Paro' },
-    DEL: { lon: 77.10, lat: 28.55, label: 'DEL', name: 'Delhi' },
-    BKK: { lon: 100.75, lat: 13.68, label: 'BKK', name: 'Bangkok' },
-    KUL: { lon: 101.70, lat: 2.74,  label: 'KUL', name: 'Kuala Lumpur' },
-    DOH: { lon: 51.61, lat: 25.27,  label: 'DOH', name: 'Doha' },
-    DXB: { lon: 55.36, lat: 25.25,  label: 'DXB', name: 'Dubai' },
-    HKG: { lon: 113.92, lat: 22.31, label: 'HKG', name: 'Hong Kong' },
-    BOM: { lon: 72.87, lat: 19.09,  label: 'BOM', name: 'Mumbai' },
-    CCU: { lon: 88.45, lat: 22.65,  label: 'CCU', name: 'Kolkata' },
-    DAC: { lon: 90.40, lat: 23.85,  label: 'DAC', name: 'Dhaka' },
-    SIN: { lon: 103.99, lat: 1.36,  label: 'SIN', name: 'Singapore' },
-    IXB: { lon: 88.33, lat: 26.68,  label: 'IXB', name: 'Bagdogra' },
-    GAU: { lon: 91.59, lat: 26.10,  label: 'GAU', name: 'Guwahati' },
-    GAY: { lon: 84.95, lat: 24.74,  label: 'GAY', name: 'Bodh Gaya' },
-  };
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        current += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
 
-  // Nepal routes
-  const nepalRoutes = ['DEL','BKK','KUL','DOH','DXB','HKG','BOM'];
-  // Druk routes
-  const drukRoutes  = ['DEL','BKK','CCU','DAC','SIN','IXB','GAU','GAY'];
+    if (char === ',' && !inQuotes) {
+      values.push(current);
+      current = '';
+      continue;
+    }
 
-  const W = 800, H = 400;
-  const toSVG = (lon, lat) => ({ x: ((lon+10)/170)*W, y: ((60-lat)/75)*H });
+    current += char;
+  }
 
-  // Build curved arc path between two points
-  const arc = (a, b) => {
-    const p1 = toSVG(a.lon, a.lat);
-    const p2 = toSVG(b.lon, b.lat);
-    const mx = (p1.x + p2.x) / 2;
-    const my = (p1.y + p2.y) / 2 - 30;
-    return `M${p1.x},${p1.y} Q${mx},${my} ${p2.x},${p2.y}`;
-  };
-
-  const mapContent = svg;
-
-  // Draw Nepal routes (red)
-  nepalRoutes.forEach(code => {
-    const ap = airports[code];
-    const hub = airports.KTM;
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const p1 = toSVG(hub.lon, hub.lat);
-    const p2 = toSVG(ap.lon, ap.lat);
-    const mx = (p1.x+p2.x)/2;
-    const my = (p1.y+p2.y)/2 - 35;
-    path.setAttribute('d', `M${p1.x},${p1.y} Q${mx},${my} ${p2.x},${p2.y}`);
-    path.setAttribute('stroke', '#E8253D');
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-dasharray', '4 3');
-    path.setAttribute('opacity', '0.7');
-    mapContent.appendChild(path);
-  });
-
-  // Draw Druk routes (teal)
-  drukRoutes.forEach(code => {
-    const ap = airports[code];
-    const hub = airports.PBH;
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    const p1 = toSVG(hub.lon, hub.lat);
-    const p2 = toSVG(ap.lon, ap.lat);
-    const mx = (p1.x+p2.x)/2;
-    const my = (p1.y+p2.y)/2 - 28;
-    path.setAttribute('d', `M${p1.x},${p1.y} Q${mx},${my} ${p2.x},${p2.y}`);
-    path.setAttribute('stroke', '#1DAB9F');
-    path.setAttribute('stroke-width', '1.5');
-    path.setAttribute('fill', 'none');
-    path.setAttribute('stroke-dasharray', '4 3');
-    path.setAttribute('opacity', '0.7');
-    mapContent.appendChild(path);
-  });
-
-  // Draw all airport dots
-  const allCodes = ['KTM','PBH',...new Set([...nepalRoutes,...drukRoutes])];
-  allCodes.forEach(code => {
-    const ap = airports[code];
-    if (!ap) return;
-    const pt = toSVG(ap.lon, ap.lat);
-    const isHub = code === 'KTM' || code === 'PBH';
-    const isNepal = code === 'KTM' || nepalRoutes.includes(code);
-    const isDruk  = code === 'PBH' || drukRoutes.includes(code);
-
-    const color = (code === 'KTM') ? '#E8253D' : (code === 'PBH') ? '#1DAB9F' :
-                  (isNepal && isDruk) ? '#F5A623' :
-                  isNepal ? '#E8253D' : '#1DAB9F';
-
-    // Dot
-    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    circle.setAttribute('cx', pt.x);
-    circle.setAttribute('cy', pt.y);
-    circle.setAttribute('r', isHub ? 6 : 4);
-    circle.setAttribute('fill', color);
-    circle.setAttribute('stroke', '#0B0D18');
-    circle.setAttribute('stroke-width', isHub ? '2' : '1.5');
-    mapContent.appendChild(circle);
-
-    // Label
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', pt.x + 8);
-    text.setAttribute('y', pt.y + 4);
-    text.setAttribute('fill', isHub ? '#EDF1FF' : '#7888A8');
-    text.setAttribute('font-size', isHub ? '10' : '8');
-    text.setAttribute('font-family', 'DM Sans, sans-serif');
-    text.setAttribute('font-weight', isHub ? '700' : '400');
-    text.textContent = ap.label;
-    mapContent.appendChild(text);
-  });
-
-  // Animated plane icons on main routes
-  animatePlane(svg, airports.KTM, airports.DEL, '#E8253D');
-  animatePlane(svg, airports.KTM, airports.BKK, '#E8253D');
-  animatePlane(svg, airports.PBH, airports.BKK, '#1DAB9F');
-  animatePlane(svg, airports.PBH, airports.CCU, '#1DAB9F');
+  values.push(current);
+  return values;
 }
 
-function animatePlane(svg, from, to, color) {
-  const p1 = { x:((from.lon+10)/170)*800, y:((60-from.lat)/75)*400 };
-  const p2 = { x:((to.lon+10)/170)*800,   y:((60-to.lat)/75)*400 };
-  const mx = (p1.x+p2.x)/2;
-  const my = (p1.y+p2.y)/2 - 32;
-
-  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
-
-  // Plane shape (simple triangle pointing right)
-  const plane = document.createElementNS('http://www.w3.org/2000/svg','polygon');
-  plane.setAttribute('points', '0,-4 8,0 0,4 2,0');
-  plane.setAttribute('fill', color);
-
-  const animMotion = document.createElementNS('http://www.w3.org/2000/svg','animateMotion');
-  animMotion.setAttribute('dur', `${6 + Math.random()*4}s`);
-  animMotion.setAttribute('repeatCount', 'indefinite');
-  animMotion.setAttribute('rotate', 'auto');
-
-  const mpath = document.createElementNS('http://www.w3.org/2000/svg','mpath');
-  // Create path el for motion
-  const pid = `mp-${Math.random().toString(36).substr(2,6)}`;
-  const pathEl = document.createElementNS('http://www.w3.org/2000/svg','path');
-  pathEl.setAttribute('id', pid);
-  pathEl.setAttribute('d', `M${p1.x},${p1.y} Q${mx},${my} ${p2.x},${p2.y}`);
-  pathEl.setAttribute('fill','none');
-  pathEl.setAttribute('stroke','none');
-  svg.appendChild(pathEl);
-
-  mpath.setAttributeNS('http://www.w3.org/1999/xlink','href','#'+pid);
-  animMotion.appendChild(mpath);
-  g.appendChild(plane);
-  g.appendChild(animMotion);
-  svg.appendChild(g);
+function normalizeAirlineKey(airline) {
+  const value = (airline || '').trim().toLowerCase();
+  if (value.includes('nepal')) return 'nepal';
+  if (value.includes('druk')) return 'druk';
+  return '';
 }
 
+function escapeHtml(value) {
+  return String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function parseRouteTable(text) {
+  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  if (lines.length < 2) return [];
+
+  const headers = parseCsvLine(lines[0]);
+
+  return lines.slice(1).map((line, index) => {
+    const values = parseCsvLine(line);
+    const row = headers.reduce((acc, header, headerIndex) => {
+      acc[header] = (values[headerIndex] || '').trim();
+      return acc;
+    }, {});
+
+    const airlineKey = normalizeAirlineKey(row.airline);
+    const viaList = row.via_iata
+      ? row.via_iata.split('|').map(code => code.trim()).filter(Boolean)
+      : [];
+
+    return {
+      ...row,
+      airlineKey,
+      origin_iata: row.origin_iata,
+      destination_iata: row.destination_iata,
+      via_iata_list: viaList,
+      seasonal: /^yes$/i.test(row.seasonal),
+      isSpecial: viaList.length > 0 || /unknown/i.test(row.service_pattern) || /unconfirmed|seasonal|special/i.test(row.status_note),
+      id: `${airlineKey}-${row.origin_iata}-${row.destination_iata}-${index}`
+    };
+  }).filter(route => route.airlineKey && route.origin_iata && route.destination_iata);
+}
+
+async function loadRouteMapData() {
+  if (routeMapState.routes.length) return routeMapState.routes;
+  const routes = parseRouteTable(EMBEDDED_ROUTE_TABLE).filter(route => /international/i.test(route.route_type));
+  const missingCodes = [...new Set(routes
+    .flatMap(route => [route.origin_iata, route.destination_iata, ...route.via_iata_list])
+    .filter(code => code && !AIRPORT_COORDS[code]))];
+
+  if (missingCodes.length) {
+    console.warn('Missing airport coordinates for route map:', missingCodes);
+  }
+
+  routeMapState.routes = routes;
+  return routes;
+}
+
+function initializeRouteMap() {
+  const mapEl = document.getElementById('route-map');
+  const shell = document.querySelector('.route-map-shell');
+  if (!mapEl || routeMapState.map) return routeMapState.map;
+  if (!window.L) throw new Error('Leaflet failed to load for the route map.');
+
+  const bounds = [
+    [ROUTE_MAP_BOUNDS.minLat, ROUTE_MAP_BOUNDS.minLon],
+    [ROUTE_MAP_BOUNDS.maxLat, ROUTE_MAP_BOUNDS.maxLon]
+  ];
+
+  const map = L.map(mapEl, {
+    zoomControl: true,
+    scrollWheelZoom: true,
+    doubleClickZoom: true,
+    touchZoom: true,
+    dragging: true,
+    boxZoom: false,
+    keyboard: false,
+    preferCanvas: true,
+    attributionControl: true,
+    minZoom: 4,
+    maxZoom: 7,
+    maxBounds: [[-8, 34], [48, 154]],
+    maxBoundsViscosity: 0.85
+  });
+
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    subdomains: 'abc',
+    minZoom: 3,
+    maxZoom: 7,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(map);
+
+  map.fitBounds(bounds, { padding: [30, 30] });
+  map.setMinZoom(4);
+  map.setMaxZoom(7);
+
+  map.createPane('routeLines');
+  map.getPane('routeLines').style.zIndex = 430;
+  map.createPane('routeMarkers');
+  map.getPane('routeMarkers').style.zIndex = 620;
+  map.createPane('routeLabels');
+  map.getPane('routeLabels').style.zIndex = 640;
+  map.getPane('routeLabels').style.pointerEvents = 'none';
+
+  routeMapState.layerGroups = {
+    lines: L.layerGroup().addTo(map),
+    markers: L.layerGroup().addTo(map),
+    labels: L.layerGroup().addTo(map)
+  };
+  routeMapState.map = map;
+  shell?.classList.add('has-live-map');
+  window.setTimeout(() => map.invalidateSize(), 0);
+
+  return map;
+}
+
+function buildRouteLatLngs(origin, destination, curvature = 0.16) {
+  const startLat = origin.lat;
+  const startLon = origin.lon;
+  const endLat = destination.lat;
+  const endLon = destination.lon;
+  const lonDelta = endLon - startLon;
+  const latDelta = endLat - startLat;
+  const distance = Math.hypot(lonDelta, latDelta);
+  const arcLift = Math.max(1.1, Math.min(7.5, distance * curvature * 0.42));
+  const controlLat = ((startLat + endLat) / 2) + arcLift;
+  const controlLon = ((startLon + endLon) / 2) - (lonDelta * 0.04);
+  const points = [];
+
+  for (let step = 0; step <= 24; step += 1) {
+    const t = step / 24;
+    const lat = ((1 - t) ** 2 * startLat) + (2 * (1 - t) * t * controlLat) + ((t ** 2) * endLat);
+    const lon = ((1 - t) ** 2 * startLon) + (2 * (1 - t) * t * controlLon) + ((t ** 2) * endLon);
+    points.push([lat, lon]);
+  }
+
+  return points;
+}
+
+function getActiveRoutes(routes, filter) {
+  if (filter === 'both') return routes;
+  return routes.filter(route => route.airlineKey === filter);
+}
+
+function getSharedDestinations(routes) {
+  const destinationMap = new Map();
+  routes.forEach(route => {
+    const airlines = destinationMap.get(route.destination_iata) || new Set();
+    airlines.add(route.airlineKey);
+    destinationMap.set(route.destination_iata, airlines);
+  });
+
+  return new Set([...destinationMap.entries()]
+    .filter(([, airlines]) => airlines.size > 1)
+    .map(([code]) => code));
+}
+
+function showRouteTooltipAt(point, html) {
+  const tooltip = document.getElementById('route-map-tooltip');
+  const shell = document.querySelector('.route-map-shell');
+  if (!tooltip || !shell) return;
+
+  tooltip.innerHTML = html;
+  const bounds = shell.getBoundingClientRect();
+  const offsetX = Math.max(12, Math.min(point.x + 16, bounds.width - 250));
+  const offsetY = Math.max(12, Math.min(point.y + 16, bounds.height - 130));
+  tooltip.style.left = `${offsetX}px`;
+  tooltip.style.top = `${offsetY}px`;
+  tooltip.classList.add('is-visible');
+  tooltip.setAttribute('aria-hidden', 'false');
+}
+
+function hideRouteTooltip() {
+  const tooltip = document.getElementById('route-map-tooltip');
+  if (!tooltip) return;
+  tooltip.classList.remove('is-visible');
+  tooltip.setAttribute('aria-hidden', 'true');
+}
+
+function buildRouteTooltipHtml(route) {
+  const airline = ROUTE_AIRLINE_META[route.airlineKey];
+  const viaText = route.via_iata_list.length ? `<div class="route-tooltip-meta">Via: ${escapeHtml(route.via_iata_list.join(', '))}</div>` : '';
+  const seasonalText = route.seasonal ? '<div class="route-tooltip-meta">Seasonal: Yes</div>' : '';
+  const statusText = route.status_note ? `<div class="route-tooltip-meta">Status: ${escapeHtml(route.status_note)}</div>` : '';
+
+  return `
+    <strong style="color:${airline.color}">${airline.label}</strong>
+    <div>${escapeHtml(route.origin_iata)} to ${escapeHtml(route.destination_iata)}</div>
+    <div class="route-tooltip-meta">Service: ${escapeHtml(route.service_pattern || 'Unknown')}</div>
+    ${viaText}
+    ${seasonalText}
+    ${statusText}
+  `;
+}
+
+function buildAirportTooltipHtml(code, airport, isHub, shared) {
+  return `
+    <strong>${escapeHtml(code)}${isHub ? ' hub' : ''}</strong>
+    <div>${escapeHtml(airport.name)}, ${escapeHtml(airport.country)}</div>
+    <div class="route-tooltip-meta">${shared ? 'Shared destination' : isHub ? 'Origin airport' : 'Destination airport'}</div>
+  `;
+}
+
+function getAirportVisualState(code, routes, sharedDestinations) {
+  const servedBy = new Set(routes
+    .filter(route => route.origin_iata === code || route.destination_iata === code)
+    .map(route => route.airlineKey));
+  const isHub = routes.some(route => route.origin_iata === code);
+  const isViaOnly = !servedBy.size && routes.some(route => route.via_iata_list.includes(code));
+
+  let fill = '#AAB6D3';
+  if (isHub && servedBy.size === 1) {
+    fill = ROUTE_AIRLINE_META[[...servedBy][0]].color;
+  } else if (sharedDestinations.has(code) && routeMapState.filter === 'both') {
+    fill = '#F5A623';
+  } else if (servedBy.size === 1) {
+    fill = ROUTE_AIRLINE_META[[...servedBy][0]].color;
+  }
+
+  return { fill, isHub, isViaOnly, shared: sharedDestinations.has(code) };
+}
+
+function updateRouteMapSummary(routes, filter) {
+  const summary = document.getElementById('route-map-summary');
+  if (!summary) return;
+
+  if (!routes.length) {
+    summary.textContent = 'No routes available for the selected airline filter.';
+    return;
+  }
+
+  const routeCount = routes.length;
+  const destinationCount = new Set(routes.map(route => route.destination_iata)).size;
+  const airportCount = new Set(routes.flatMap(route => [route.origin_iata, route.destination_iata, ...route.via_iata_list])).size;
+  const filterLabel = filter === 'both'
+    ? 'Both airlines'
+    : ROUTE_AIRLINE_META[filter]?.label || 'Selected airline';
+
+  summary.textContent = `${filterLabel}: ${routeCount} international routes, ${destinationCount} destinations, ${airportCount} mapped airports.`;
+}
+
+function setupRouteMapControls() {
+  if (routeMapState.initialized) return;
+
+  document.querySelectorAll('[data-route-filter]').forEach(button => {
+    button.addEventListener('click', () => {
+      routeMapState.filter = button.dataset.routeFilter;
+      document.querySelectorAll('[data-route-filter]').forEach(control => {
+        control.classList.toggle('is-active', control === button);
+      });
+      drawRouteMap();
+    });
+  });
+
+  document.querySelector('.route-map-shell')?.addEventListener('mouseleave', hideRouteTooltip);
+  routeMapState.initialized = true;
+}
+
+function drawRouteMap() {
+  const map = initializeRouteMap();
+  if (!map || !routeMapState.layerGroups) return;
+
+  const routes = getActiveRoutes(routeMapState.routes, routeMapState.filter)
+    .filter(route => AIRPORT_COORDS[route.origin_iata] && AIRPORT_COORDS[route.destination_iata]);
+  const sharedDestinations = getSharedDestinations(routeMapState.routes);
+
+  routeMapState.layerGroups.lines.clearLayers();
+  routeMapState.layerGroups.markers.clearLayers();
+  routeMapState.layerGroups.labels.clearLayers();
+  hideRouteTooltip();
+  updateRouteMapSummary(routes, routeMapState.filter);
+
+  if (!routes.length) return;
+
+  const activeCodes = new Set();
+
+  routes.forEach(route => {
+    activeCodes.add(route.origin_iata);
+    activeCodes.add(route.destination_iata);
+    route.via_iata_list.forEach(code => activeCodes.add(code));
+
+    const airline = ROUTE_AIRLINE_META[route.airlineKey];
+    const latLngs = buildRouteLatLngs(
+      AIRPORT_COORDS[route.origin_iata],
+      AIRPORT_COORDS[route.destination_iata],
+      route.airlineKey === 'nepal' ? 0.2 : 0.16
+    );
+
+    const routeLine = L.polyline(latLngs, {
+      pane: 'routeLines',
+      color: airline.color,
+      weight: route.isSpecial ? 2 : 2.6,
+      opacity: route.isSpecial ? 0.72 : 0.9,
+      dashArray: route.isSpecial ? '7 6' : null,
+      lineCap: 'round',
+      lineJoin: 'round'
+    });
+
+    const tooltipHtml = buildRouteTooltipHtml(route);
+    routeLine.on('mouseover', event => showRouteTooltipAt(event.containerPoint, tooltipHtml));
+    routeLine.on('mousemove', event => showRouteTooltipAt(event.containerPoint, tooltipHtml));
+    routeLine.on('mouseout', hideRouteTooltip);
+    routeMapState.layerGroups.lines.addLayer(routeLine);
+  });
+
+  [...activeCodes].forEach(code => {
+    const airport = AIRPORT_COORDS[code];
+    if (!airport) return;
+    const latLng = [airport.lat, airport.lon];
+    const markerState = getAirportVisualState(code, routes, sharedDestinations);
+
+    if (markerState.isHub) {
+      routeMapState.layerGroups.markers.addLayer(L.circleMarker(latLng, {
+        pane: 'routeMarkers',
+        radius: 13,
+        stroke: true,
+        color: '#FFFFFF',
+        weight: 1.4,
+        fillColor: markerState.fill,
+        fillOpacity: 0.18
+      }));
+    }
+
+    const airportMarker = L.circleMarker(latLng, {
+      pane: 'routeMarkers',
+      radius: markerState.isHub ? 6.6 : markerState.isViaOnly ? 3.4 : 4.2,
+      fillColor: markerState.fill,
+      stroke: true,
+      color: markerState.isHub ? '#F7FBFF' : '#0B0D18',
+      weight: markerState.isHub ? 2.4 : 1.4,
+      opacity: markerState.isViaOnly ? 0.85 : 1,
+      fillOpacity: 1
+    });
+    const airportTooltipHtml = buildAirportTooltipHtml(code, airport, markerState.isHub, markerState.shared);
+    airportMarker.on('mouseover', event => showRouteTooltipAt(event.containerPoint, airportTooltipHtml));
+    airportMarker.on('mousemove', event => showRouteTooltipAt(event.containerPoint, airportTooltipHtml));
+    airportMarker.on('mouseout', hideRouteTooltip);
+    routeMapState.layerGroups.markers.addLayer(airportMarker);
+
+    const labelOffset = AIRPORT_LABEL_OFFSETS[code] || { x: 8, y: 4, anchor: 'start' };
+    const anchorX = labelOffset.anchor === 'end' ? 60 : labelOffset.anchor === 'middle' ? 30 : 0;
+    const hubLabelClass = markerState.isHub
+      ? code === 'KTM'
+        ? ' route-airport-label-nepalhub'
+        : code === 'PBH'
+          ? ' route-airport-label-drukhub'
+          : ''
+      : '';
+    routeMapState.layerGroups.labels.addLayer(L.marker(latLng, {
+      pane: 'routeLabels',
+      interactive: false,
+      icon: L.divIcon({
+        className: markerState.isHub ? `route-airport-label route-airport-label-hub${hubLabelClass}` : 'route-airport-label',
+        html: `<span style="display:inline-block;transform:translate(${labelOffset.x}px, ${labelOffset.y}px);text-align:${labelOffset.anchor === 'end' ? 'right' : 'left'};">${escapeHtml(code)}</span>`,
+        iconSize: [60, 18],
+        iconAnchor: [anchorX, 9]
+      })
+    }));
+  });
+}
+
+async function renderMap() {
+  const mapEl = document.getElementById('route-map');
+  if (!mapEl) return;
+
+  setupRouteMapControls();
+
+  try {
+    await loadRouteMapData();
+    drawRouteMap();
+  } catch (error) {
+    console.error(error);
+    mapEl.innerHTML = '';
+    document.querySelector('.route-map-shell')?.classList.remove('has-live-map');
+    const summary = document.getElementById('route-map-summary');
+    if (summary) {
+      summary.textContent = 'Interactive basemap could not be loaded, so the route tracker is showing the built-in fallback map instead.';
+    }
+  }
+}
 /* ── RECOMMENDATIONS ── */
 const RECOS = [
   {
@@ -718,3 +1055,4 @@ document.addEventListener('DOMContentLoaded', () => {
   renderRecos();
   setupUpload();
 });
+
