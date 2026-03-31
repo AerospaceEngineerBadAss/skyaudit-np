@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fleet Comparison | SkyAudit NP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <link rel="stylesheet" href="../assets/style.css"/>
+</head>
+<body class="fleet-page">
+<header class="topbar">
+  <div class="topbar-logo">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="9" fill="#C8102E"/>
+      <path d="M5 18L12.5 13.5L10 8L13.5 9.5L15.5 14L21 11.5L23 13L18.5 16L25 15.5L25.5 17.5L17.5 19.5L15 25L12 26L13.5 20.5L7.5 23L5 18Z" fill="white"/>
+      <path d="M10 26.5L24 26.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+    <div>
+      <span class="logo-name">SkyAudit NP</span>
+      <span class="logo-sub">Nepal Aviation - Benchmark Analysis</span>
+    </div>
+  </div>
+
+  <nav class="topbar-nav" aria-label="Primary">
+    <a class="topbar-nav-link" href="../">Home</a>
+    <a class="topbar-nav-link is-active" href="./">Fleet</a>
+  </nav>
+
+  <div class="topbar-right">
+    <span class="badge">2025 - 2026 fleet baseline</span>
+  </div>
+</header>
+
+<main>
+  <div class="container">
+    <section class="fleet-hero">
+      <div class="fleet-breadcrumbs">
+        <a href="../">Home</a>
+        <span>/</span>
+        <span>Fleet Comparison</span>
+      </div>
+      <div class="section-label">Fleet Analysis</div>
+      <h1 class="fleet-page-title">Fleet Comparison</h1>
+      <p class="fleet-page-subtitle">Compare the current fleet structure of Drukair and Nepal Airlines, including aircraft mix, seat capacity, and operational implications.</p>
+    </section>
+
+    <section class="fleet-section">
+      <div class="section-label">Summary</div>
+      <h2 class="section-title">Side-by-side fleet profile</h2>
+      <p class="section-desc">Metrics are computed directly from the centralized fleet dataset. Helicopter and specialty aircraft remain visible in fleet structure metrics, but they are excluded from seat-capacity comparisons.</p>
+      <div id="fleet-summary-grid" class="fleet-summary-grid"></div>
+    </section>
+
+    <section class="fleet-section">
+      <div class="section-label">Visual Comparison</div>
+      <h2 class="section-title">Capacity, mix, and aircraft concentration</h2>
+      <p class="section-desc">Charts are kept intentionally compact for executive review while preserving enough detail for analyst follow-up.</p>
+      <div class="fleet-note card">
+        <strong>Comparison note</strong>
+        <p>Seat-based comparisons exclude helicopter/specialty aircraft and do not fully capture utility or special-mission value.</p>
+      </div>
+      <div class="fleet-chart-grid">
+        <article class="card fleet-chart-card">
+          <div class="card-title">Active seat capacity by airline</div>
+          <div class="chart-wrap fleet-chart-wrap"><canvas id="seat-capacity-chart"></canvas></div>
+        </article>
+        <article class="card fleet-chart-card">
+          <div class="card-title">Fleet mix by category</div>
+          <div class="chart-wrap fleet-chart-wrap"><canvas id="fleet-mix-chart"></canvas></div>
+        </article>
+        <article class="card fleet-chart-card">
+          <div class="card-title">Aircraft count by type</div>
+          <div class="chart-wrap fleet-chart-wrap"><canvas id="aircraft-type-chart"></canvas></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="fleet-section">
+      <div class="section-label">Aircraft Detail</div>
+      <h2 class="section-title">Line-by-line fleet table</h2>
+      <p class="section-desc">Each row represents one aircraft tail in the current dataset. Active helicopters remain included here for complete fleet visibility.</p>
+      <div class="fleet-table-toolbar">
+        <div id="fleet-table-filters" class="fleet-table-filters" role="group" aria-label="Fleet table filters"></div>
+      </div>
+      <div class="compare-wrap fleet-table-wrap">
+        <div class="fleet-table-scroll">
+          <table class="compare-table fleet-table">
+            <thead>
+              <tr>
+                <th>Airline</th>
+                <th>Aircraft type</th>
+                <th>Tail</th>
+                <th>Status</th>
+                <th>Seat layout</th>
+                <th>Total seats</th>
+                <th>Category</th>
+                <th>Role / mission</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody id="fleet-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="fleet-section last">
+      <div class="section-label">Implications</div>
+      <h2 class="section-title">Strategic implications</h2>
+      <p class="section-desc">A management-style readout derived from the current fleet mix and seat-capacity profile.</p>
+      <div class="insight-box fleet-insight-box">
+        <ul id="fleet-implications-list" class="fleet-implications-list"></ul>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="../assets/fleet-data.js"></script>
+<script src="../assets/fleet.js"></script>
+</body>
+</html>
