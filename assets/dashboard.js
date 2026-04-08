@@ -1046,6 +1046,37 @@ function setupUpload() {
 }
 
 /* ── INIT ── */
+function renderHomeFinancialMetrics() {
+  const host = document.getElementById('home-financial-metrics');
+  const financialData = window.SKYAUDIT_FINANCIAL_DATA;
+  if (!host || !financialData || !financialData.kpis) return;
+
+  const metrics = [
+    { label: 'Revenue', value: financialData.kpis.revenue },
+    { label: 'Expenditure', value: financialData.kpis.costOfSales + financialData.kpis.operatingExpenditure },
+    { label: 'Net Profit/Loss', value: financialData.kpis.netProfitLoss },
+    { label: 'Cash', value: financialData.kpis.cashAndCashEquivalents }
+  ];
+
+  host.innerHTML = metrics.map(metric => `
+    <div class="home-financial-metric${metric.value < 0 ? ' is-negative' : ''}">
+      <span class="home-financial-metric-label">${metric.label}</span>
+      <span class="home-financial-metric-value" title="${formatFullFinancial(metric.value)}">${formatCompactFinancial(metric.value)}</span>
+    </div>
+  `).join('');
+}
+
+function formatCompactFinancial(value) {
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 2
+  }).format(value);
+}
+
+function formatFullFinancial(value) {
+  return new Intl.NumberFormat('en-US').format(value);
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   renderTable();
   renderOTPChart();
@@ -1053,6 +1084,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderDelayChart();
   renderMap();
   renderRecos();
+  renderHomeFinancialMetrics();
   setupUpload();
 });
 

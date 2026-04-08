@@ -33,6 +33,7 @@
   <nav class="topbar-nav" aria-label="Primary">
     <a class="topbar-nav-link is-active" href="./">Home</a>
     <a class="topbar-nav-link" href="fleet/">Fleet</a>
+    <a class="topbar-nav-link" href="financial/">Financial</a>
   </nav>
 
   <div class="topbar-right">
@@ -179,6 +180,22 @@
 <!-- ═══════════════════════════════════════════════════
      WORLD MAP — ROUTE TRACKER
 ═══════════════════════════════════════════════════ -->
+<section class="home-feature-section">
+  <div class="section-label">Financial Data</div>
+  <h2 class="section-title">Financial Data &amp; Insights</h2>
+  <p class="section-desc">Explore workbook-backed Nepal Airlines financial statement data, visual summaries, and downloadable source files.</p>
+
+  <div class="card featured-link-card">
+    <div>
+      <p class="featured-link-copy">A quick financial snapshot drawn from the workbook, showing Revenue, Expenditure, Net Profit/Loss, and Cash</p>
+      <div id="home-financial-metrics" class="home-financial-metrics" aria-label="Homepage financial key metrics"></div>
+    </div>
+    <div class="featured-link-actions">
+      <a class="btn btn-secondary" href="financial/">Explore Financial Statements</a>
+    </div>
+  </div>
+</section>
+
 <section>
   <div class="section-label">Route Network</div>
   <h2 class="section-title">Live Route Map</h2>
@@ -539,6 +556,7 @@
 </footer>
 
 <script src="assets/vendor/leaflet/leaflet.js"></script>
+<script src="assets/financial-data.js"></script>
 <script src="assets/dashboard.js"></script>
 </body>
 </html>
